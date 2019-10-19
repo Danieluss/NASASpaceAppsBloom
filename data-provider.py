@@ -37,7 +37,7 @@ class Resource:
 class DataProvider:
     def __init__(self):
         self.resources = {}
-        self.base = 'http://oceandata.sci.gsfc.nasa.gov/cgi/getfile/A{}{}{}{}.L3m_{}_9km.nc'
+        self.base = 'https://oceandata.sci.gsfc.nasa.gov/cgi/getfile/A{}{}{}{}.L3m_{}_9km.nc'
         self.names = ['MO_CHL_chlor_a', 'MO_FLH_nflh', 'MO_FLH_ipar', 'MO_NSST_sst', 'MO_PIC_pic', 'MO_POC_poc']
 
     def fetch(self, year, month):
@@ -52,11 +52,12 @@ class DataProvider:
     def fetch_for(self, name, year, month):
         if self.resources.get(name) is None:
             self.resources[name] = {}
-        self.resources[name][str(year) + str(month)] = self.cached_fetch(
-            self.base.format(str(year), self.to_day_of_year(datetime.datetime(year=year, month=month, day=1)), year,
-                             self.to_day_of_year(
-                                 datetime.datetime(year=year, month=month, day=daysInMonth(year, month))),
-                             name), name + str(year) + str(month))
+        if self.resources.get(name).get(str(year) + str(month)) is None:
+            self.resources[name][str(year) + str(month)] = self.cached_fetch(
+                self.base.format(str(year), self.to_day_of_year(datetime.datetime(year=year, month=month, day=1)), year,
+                                 self.to_day_of_year(
+                                     datetime.datetime(year=year, month=month, day=daysInMonth(year, month))),
+                                 name), name + str(year) + str(month))
 
     def cached_fetch(self, url, filename):
         print(url)
@@ -65,10 +66,12 @@ class DataProvider:
             return resource.load()
         except:
             resource = Resource(url, filename)
-        return resource.fetch()
+            resource.fetch()
+        return resource
 
     def get(self):
         return self.resources
 
-if __name__ == '__main__':
-    DataProvider().fetch(2019, 5).save()
+
+# if __name__ == '__main__':
+#     DataProvider().fetch(2019, 5)
