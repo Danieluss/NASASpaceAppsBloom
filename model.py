@@ -16,7 +16,7 @@ from tqdm import tqdm
 
 print("[MODEL]")
 
-THRESHOLD = 1  # FIXME: in future linear
+THRESHOLD = 0.8  # FIXME: in future linear
 NUM_ROUNDS = 100 * 50000
 MODEL_PATH = "treeboost.txt"
 PARAMS = {
@@ -40,18 +40,29 @@ PARAMS = {
 
 
 def get_dataset():
+    global THRESHOLD
+
     kanapki = []
 
     from features import FeaturesExtractor
 
-    f = FeaturesExtractor(200910)
-
+    f = FeaturesExtractor(20195)
+    """
     for _ in tqdm(range(1000)):
         a = f.get_grid(np.random.randint(-50, 50), np.random.randint(-50, 50))
         if not np.isnan(a[:, :, 0].mean()):
             print("-->", a[:, :, 0].mean())
             kanapki.append(
                 Kanapka(features=a[:, :, 1:], label=a[:, :, 0].mean()))
+    """
+
+    a = f.get_dataset(1000, threshold=THRESHOLD)
+
+    for x in a:
+        print(f"---> {x.shape}")
+        if x.shape != (9, 9, 6):
+            continue
+        kanapki.append(Kanapka(features=x[:, :, 1:], label=x[:, :, 0].mean()))
 
     return Dataset(kanapki=kanapki)
 
@@ -141,10 +152,11 @@ class Model:
 if __name__ == "__main__":
     """
     """
-    dataset = Dataset()
+    # dataset = Dataset(kanapki=get_dataset())
+    dataset = get_dataset()
     model = Model(dataset=dataset)
     model.train()
 
-    for i in range(10):
+    for i in range(100):
         pred = model.predict([dataset.X[i]])
         print(f"PRED {pred} | {dataset.y[i]}")
