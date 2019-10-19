@@ -12,13 +12,12 @@ class SF:
 
 
 class FeaturesExtractor:
-    def __init__(self, year, month, size_x=9, size_y=9, distance=40, step=1):
+    def __init__(self, year, month, size_x=9, size_y=9, step=1):
         DataProvider().fetch(year, month)
         self.year = year
         self.month = month
         self.size_x = size_x
         self.size_y = size_y
-        self.distance = distance
         self.step = step
         self.features = [
             SF("MO_CHL_chlor_a", "chlor_a"),
@@ -134,7 +133,7 @@ class FeaturesDiff:
 
     def get_dataset(self, n=1000, threshold=0.8):
         n = n // 2
-        val = np.argwhere(self.f1.arrays[0][2] > threshold)
+        val = np.argwhere(self.f1.arrays[0][2][:-self.f1.dx,:-self.f1.dy] > threshold)
         res = []
         for i in tqdm(range(n)):
             r = np.random.randint(0, len(val))
@@ -144,7 +143,7 @@ class FeaturesDiff:
                 self.f2.get_grid_mod(v[0], v[1]),
             ])
 
-        val = np.argwhere(self.f1.arrays[0][2] <= threshold)
+        val = np.argwhere(self.f1.arrays[0][2][:-self.f1.dx,:-self.f1.dy] <= threshold)
         for i in tqdm(range(n)):
             r = np.random.randint(0, len(val))
             v = val[r]
@@ -157,12 +156,19 @@ class FeaturesDiff:
 
 if __name__ == "__main__":
     f = FeaturesExtractor(2018, 7, 9, 9)
-    a = f.get_grid(lat=0.0, lon=0.0)[:, :, 0]
+    # a = f.get_grid(lat=0.0, lon=0.0)[:, :, 0]
     # a = a/np.max(a[np.isnan(a) == False])
 
-    a[a < 0.7] = np.nan
+    # a[a < 0.7] = np.nan
 
-    c = f.get_dataset(2)
+    c = f.get_dataset(10000)
+    i=0
+    for a in c:
+        i+=1
+        if a.shape != (9, 9, 7):
+            print(a.shape)
+    print(i)
+    exit(0)
     # print(c.shape)
 
     b = f.get_waters()
