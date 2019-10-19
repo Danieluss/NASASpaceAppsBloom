@@ -127,6 +127,34 @@ class FeaturesExtractor:
         return np.array(res)
 
 
+class FeaturesDiff:
+    def __init__(self, f1=None, f2=None):
+        self.f1 = f1
+        self.f2 = f2
+
+    def get_dataset(self, n=1000, threshold=0.8):
+        n = n // 2
+        val = np.argwhere(self.f1.arrays[0][2] > threshold)
+        res = []
+        for i in tqdm(range(n)):
+            r = np.random.randint(0, len(val))
+            v = val[r]
+            res.append([
+                self.f1.get_grid_mod(v[0], v[1]),
+                self.f2.get_grid_mod(v[0], v[1]),
+            ])
+
+        val = np.argwhere(self.f1.arrays[0][2] <= threshold)
+        for i in tqdm(range(n)):
+            r = np.random.randint(0, len(val))
+            v = val[r]
+            res.append([
+                self.f1.get_grid_mod(v[0], v[1]),
+                self.f2.get_grid_mod(v[0], v[1]),
+            ])
+        return res
+
+
 if __name__ == "__main__":
     f = FeaturesExtractor(2018, 7, 9, 9)
     a = f.get_grid(lat=0.0, lon=0.0)[:, :, 0]
@@ -143,7 +171,7 @@ if __name__ == "__main__":
 
     # # print(np.count_nonzero(a > 0.7)/a.size)
     # # ax[1].imshow(f.interpolate(a))
-    
+
     # plt.imshow(b[::10,::10])
     n = c.shape[-1]
     fig, ax = plt.subplots(1, n)

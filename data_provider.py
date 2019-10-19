@@ -41,8 +41,14 @@ class DataProvider:
         self.names = ['MO_CHL_chlor_a', 'MO_FLH_nflh', 'MO_FLH_ipar', 'MO_NSST_sst', 'MO_PIC_pic', 'MO_POC_poc']
 
     def fetch(self, year, month):
-        year = year
-        month = month
+        if isinstance(year, list):
+            for y in year:
+                self.fetch(y, month)
+            return
+        if isinstance(month, list):
+            for m in month:
+                self.fetch(year, m)
+            return
         for name in self.names:
             self.fetch_for(name, year, month)
 
@@ -73,4 +79,4 @@ class DataProvider:
 
 
 if __name__ == '__main__':
-    DataProvider().fetch(2019, 5)
+    DataProvider().fetch(2019, [5, 6])
