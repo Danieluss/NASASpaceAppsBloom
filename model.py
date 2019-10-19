@@ -44,12 +44,9 @@ def get_dataset():
 
     kanapki = []
 
-    from features import FeaturesExtractor, FeaturesDiff
+    from dataset import Data
 
-    f1 = FeaturesExtractor(20195, 9, 9)
-    f2 = FeaturesExtractor(20196, 9, 9)
-
-    f = FeaturesDiff(f1=f1, f2=f2)
+    d = Data(2018)
     """
     for _ in tqdm(range(1000)):
         a = f.get_grid(np.random.randint(-50, 50), np.random.randint(-50, 50))
@@ -59,13 +56,11 @@ def get_dataset():
                 Kanapka(features=a[:, :, 1:], label=a[:, :, 0].mean()))
     """
 
-    a = f.get_dataset(n=5 * 1000, threshold=THRESHOLD)
+    a = d.load_dataset()
+    print(a.shape)
 
     for x, y in a:
-        print(f"---> {x.shape}")
-        if x.shape != (9, 9, 6) or y.shape != (9, 9, 6):
-            continue
-        kanapki.append(Kanapka(features=x[:, :, 0:], label=y[:, :, 0].mean()))
+        kanapki.append(Kanapka(features=x[:, :, 0:], label=np.nanmean(y[:, :, 0])))
 
     return Dataset(kanapki=kanapki)
 
