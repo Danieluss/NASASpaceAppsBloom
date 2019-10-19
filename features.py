@@ -13,7 +13,7 @@ class FeaturesExtractor():
         self.size_x = size_x
         self.size_y = size_y
         self.distance = distance
-        self.features = [SF('a', 'chl_ocx')]
+        self.features = [SF('a', 'chl_ocx'), SF('b', 'sst')]
         self.arrays = []
         for sf in self.features:
             self.arrays.append(self.get_array(sf))
@@ -37,8 +37,7 @@ class FeaturesExtractor():
         x_s = x-self.size_x//2
         y_s = y-self.size_y//2
         res = self.arrays[i][2][x_s:x_s+self.size_x:1, y_s:y_s+self.size_y:1]
-        #TODO interpolate
-
+        res = self.interpolate(res)
         return res
     
     def interpolate(self, arr):
@@ -51,12 +50,12 @@ class FeaturesExtractor():
         arr = arr[~arr.mask]
         return scipy.interpolate.griddata((x1, y1), arr.ravel(), (xx, yy), method='cubic')
 
+if __name__ == "__main__":
+    f = FeaturesExtractor(200910, 100, 100)
+    a = f.get_grid(lat=50.0, lon=-20.0)[:,:,0].reshape(100, 100)
+    a = a/np.max(a[np.isnan(a) == False])
 
-f = FeaturesExtractor(200910)
-a = f.get_grid().reshape(9, 9)
-
-import matplotlib.pyplot as plt
-fig, ax = plt.subplots(1, 2)
-ax[0].imshow(a)
-# ax[1].imshow(f.interpolate(a))
-plt.show()
+    import matplotlib.pyplot as plt
+    plt.imshow(a)
+    # ax[1].imshow(f.interpolate(a))
+    plt.show()
