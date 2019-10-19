@@ -127,11 +127,11 @@ if __name__ == "__main__":
     f = FeaturesExtractor(200910)
 
     for _ in tqdm(range(1000)):
-        a = f.get_grid(np.random.randint(-50, 50),
-                       np.random.randint(-50, 50)).reshape(9, 9, 2)
-        if not np.isnan(a.mean()):
-            print("-->", a.mean())
-            kanapki.append(Kanapka(features=a, label=a.mean()))
+        a = f.get_grid(np.random.randint(-50, 50), np.random.randint(-50, 50))
+        if not np.isnan(a[:, :, 0].mean()):
+            print("-->", a[:, :, 0].mean())
+            kanapki.append(
+                Kanapka(features=a[:, :, 1:], label=a[:, :, 0].mean()))
 
     dataset = Dataset(kanapki=kanapki)
     model = Model(dataset=dataset)
