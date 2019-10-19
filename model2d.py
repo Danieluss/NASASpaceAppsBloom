@@ -59,30 +59,26 @@ def bottleneck_residual_block(X, kernel_size, filters, reduce=False, s=2):
 def ResNet9(x_size, y_size, features):
     X_input = Input((x_size, y_size, features))
 
-    X = Conv2D(32, (7, 7), strides=(2, 2), name="conv1",
+    X = Conv2D(32, (5, 5), strides=(2, 2), name="conv1",
                padding="same")(X_input)
     X = BatchNormalization(axis=3, name="bn_conv1")(X)
     X = Activation("relu")(X)
     X = MaxPool2D((3, 3), strides=(2, 2), padding="same")(X)
 
-    X = bottleneck_residual_block(X, 3, [32, 32])
+    X = bottleneck_residual_block(X, 2, [32, 32])
 
-    X = bottleneck_residual_block(X, 3, [64, 64], reduce=True, s=2)
-
-    # X = bottleneck_residual_block(X, 3, [128, 128], reduce=True, s=2)
-
-    # X = bottleneck_residual_block(X, 3, [256, 256], reduce=True, s=2)
+    X = bottleneck_residual_block(X, 2, [64, 64], reduce=True, s=2)
 
     X = GlobalAvgPool2D()(X)
 
     X = Flatten()(X)
-    X = Dense(2, activation="softmax", name="fc")(X)
+    X = Dense(2, activation="sigmoid", name="fc")(X)
 
     model = Model(inputs=X_input, outputs=X, name="ResNet9")
 
     model.compile(
         loss="binary_crossentropy",
-        optimizer=Adam(lr=0.005),
+        optimizer=Adam(lr=0.001),
         metrics=["binary_accuracy"],
     )
     return model
@@ -118,27 +114,14 @@ def get_dataset():
 
     kanapki = []
 
-    from features import FeaturesExtractor, FeaturesDiff
+    from dataset import Data
 
-    f1 = FeaturesExtractor(2019, 5, 9, 9)
-    f2 = FeaturesExtractor(2019, 6, 9, 9)
+    d = Data(2018)
 
-    f = FeaturesDiff(f1=f1, f2=f2)
-    """
-    for _ in tqdm(range(1000)):
-        a = f.get_grid(np.random.randint(-50, 50), np.random.randint(-50, 50))
-        if not np.isnan(a[:, :, 0].mean()):
-            print("-->", a[:, :, 0].mean())
-            kanapki.append(
-                Kanapka(features=a[:, :, 1:], label=a[:, :, 0].mean()))
-    """
-
-    a = f.get_dataset(n=2000, threshold=THRESHOLD)
+    a = d.load_dataset()
+    print(a.shape)
 
     for x, y in a:
-        if x.shape != SHAPE or y.shape != SHAPE:
-            print(f"\033[92m---> {x.shape}\033[m")
-            continue
         kanapki.append(
             Kanapka(features=x[:, :, 0:], label=np.nanmean(y[:, :, 0])))
 
