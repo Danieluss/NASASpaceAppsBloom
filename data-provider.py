@@ -38,7 +38,7 @@ class DataProvider:
     def fetch(self, year, month):
         year = str(year)
         month = str(month)
-        self.fetch_for('DAY_CHL_chlor_a', year, month)
+        self.fetch_for('MO_CHL_chlor_a', year, month)
         self.fetch_for('MO_FLH_nflh', year, month)
         self.fetch_for('MO_FLH_ipar', year, month)
         self.fetch_for('MO_NSST_sst', year, month)
