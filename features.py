@@ -38,7 +38,7 @@ class FeaturesExtractor():
         x_s = x-self.size_x//2
         y_s = y-self.size_y//2
         res = self.arrays[i][2][x_s:x_s+self.size_x:1, y_s:y_s+self.size_y:1]
-        if np.count_nonzero(np.isnan(res)==False) > 0:
+        if np.count_nonzero(np.isnan(res)==False) > 5:
             res = self.interpolate(res)
         return res
     
