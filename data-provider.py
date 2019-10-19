@@ -66,12 +66,11 @@ class DataProvider:
             return resource.load()
         except:
             resource = Resource(url, filename)
-            resource.fetch()
-        return resource
+        return resource.fetch()
 
     def get(self):
         return self.resources
 
 
-# if __name__ == '__main__':
-#     DataProvider().fetch(2019, 5)
+if __name__ == '__main__':
+    DataProvider().fetch(2019, 5)

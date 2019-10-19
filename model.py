@@ -21,6 +21,8 @@ NUM_ROUNDS = 100 * 50000
 MODEL_PATH = "treeboost.txt"
 PARAMS = {
     "boosting_type": "gbdt",
+    # "objective": "regression",
+    # "metric": "l2",
     "objective": "binary",
     "metric": ["binary_error", "binary_logloss"],
     "is_unbalance": True,
@@ -35,6 +37,23 @@ PARAMS = {
     "min_child_weight": 0.5,
     "is_training_metric": "True",
 }
+
+
+def get_dataset():
+    kanapki = []
+
+    from features import FeaturesExtractor
+
+    f = FeaturesExtractor(200910)
+
+    for _ in tqdm(range(1000)):
+        a = f.get_grid(np.random.randint(-50, 50), np.random.randint(-50, 50))
+        if not np.isnan(a[:, :, 0].mean()):
+            print("-->", a[:, :, 0].mean())
+            kanapki.append(
+                Kanapka(features=a[:, :, 1:], label=a[:, :, 0].mean()))
+
+    return Dataset(kanapki=kanapki)
 
 
 class Kanapka:
@@ -120,20 +139,9 @@ class Model:
 
 
 if __name__ == "__main__":
-    kanapki = []
-
-    from features import FeaturesExtractor
-
-    f = FeaturesExtractor(200910)
-
-    for _ in tqdm(range(1000)):
-        a = f.get_grid(np.random.randint(-50, 50), np.random.randint(-50, 50))
-        if not np.isnan(a[:, :, 0].mean()):
-            print("-->", a[:, :, 0].mean())
-            kanapki.append(
-                Kanapka(features=a[:, :, 1:], label=a[:, :, 0].mean()))
-
-    dataset = Dataset(kanapki=kanapki)
+    """
+    """
+    dataset = Dataset()
     model = Model(dataset=dataset)
     model.train()
 
