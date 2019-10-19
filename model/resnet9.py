@@ -71,7 +71,7 @@ def ResNet9(x_size, y_size, features):
 
     X = GlobalAvgPool2D()(X)
 
-    X = Flatten()(X)
+    X = Flatten()(X)  # sigmoid/softmax
     X = Dense(2, activation="sigmoid", name="fc")(X)
 
     model = Model(inputs=X_input, outputs=X, name="ResNet9")

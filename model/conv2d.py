@@ -45,9 +45,9 @@ class ModelConv2d:
 
     @staticmethod
     def get(cls):
-        x = cls.features
-        x_min = x.min(axis=(1, 2), keepdims=True)
-        x_max = x.max(axis=(1, 2), keepdims=True)
+        x = cls.features  # FIXME (1, 2)
+        x_min = x.min(axis=(2), keepdims=True)
+        x_max = x.max(axis=(2), keepdims=True)
 
         x = (x - x_min) / (x_max - x_min)
         norm = x

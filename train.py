@@ -15,6 +15,7 @@ from tqdm import tqdm
 
 from dataset import Data
 from model.tree import ModelTree
+from model.treemean import ModelTreeMean
 from model.conv2d import ModelConv2d
 
 print("[MODEL]")
@@ -32,12 +33,27 @@ def get_dataset(model_block, year=2018):
     print(a.shape)
 
     for x, y in a:
+        x_map = model_block.get_input(x)
+        """
         kanapki.append(
             Kanapka(
                 model_block=model_block,
-                features=model_block.get_input(x),
+                features=x_map,
                 label=model_block.get_output(y),
             ))
+        """
+        # FIXME: add [[augment]]
+        for _ in range(4):
+            x_copy = x_map
+            x_map = np.swapaxes(x_map, 0, 1)
+            if np.array_equal(x_copy, x_map):
+                break
+            kanapki.append(
+                Kanapka(
+                    model_block=model_block,
+                    features=x_map,
+                    label=model_block.get_output(y),
+                ))
 
     return Dataset(model_block=model_block,
                    kanapki=kanapki,
@@ -96,6 +112,7 @@ class Dataset:
 
 if __name__ == "__main__":
     # model_block = ModelConv2d  # FIXME: ModelConv2d
+    # model_block = ModelConv2d
     model_block = ModelTree
 
     dataset = get_dataset(model_block)
