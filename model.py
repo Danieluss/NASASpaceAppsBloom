@@ -12,10 +12,11 @@ import lightgbm as lgb
 
 from sklearn.model_selection import train_test_split
 from pprint import pprint
+from tqdm import tqdm
 
 print("[MODEL]")
 
-THRESHOLD = 5
+THRESHOLD = 1  # FIXME: in future linear
 NUM_ROUNDS = 100 * 50000
 MODEL_PATH = "treeboost.txt"
 PARAMS = {
@@ -38,9 +39,9 @@ PARAMS = {
 
 class Kanapka:
     # FIXME: TO MODYFIKUJE KAMIL
-    def __init__(self, _S=None, _C=None):
-        self.features = _S
-        self.label = _C
+    def __init__(self, features=None, label=None):
+        self.features = features
+        self.label = label
 
     def fake(self):
         # 9x9 (3 features)
@@ -119,7 +120,20 @@ class Model:
 
 
 if __name__ == "__main__":
-    dataset = Dataset()
+    kanapki = []
+
+    from features import FeaturesExtractor
+
+    f = FeaturesExtractor(200910)
+
+    for _ in tqdm(range(1000)):
+        a = f.get_grid(np.random.randint(-50, 50),
+                       np.random.randint(-50, 50)).reshape(9, 9, 2)
+        if not np.isnan(a.mean()):
+            print("-->", a.mean())
+            kanapki.append(Kanapka(features=a, label=a.mean()))
+
+    dataset = Dataset(kanapki=kanapki)
     model = Model(dataset=dataset)
     model.train()
 
