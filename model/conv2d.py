@@ -36,6 +36,14 @@ class ModelConv2d:
         return self.model.predict(arr)
 
     @staticmethod
+    def get_input(x):
+        return x[:, :, 0:]
+
+    @staticmethod
+    def get_output(y):
+        return np.nanmean(y[:, :, 0])
+
+    @staticmethod
     def get(cls):
         x = cls.features
         x_min = x.min(axis=(1, 2), keepdims=True)

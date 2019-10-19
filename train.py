@@ -22,11 +22,11 @@ print("[MODEL]")
 THRESHOLD = 0.8  # FIXME: in future linear
 
 
-def get_dataset(model_block):
+def get_dataset(model_block, year=2018):
     global THRESHOLD
 
     kanapki = []
-    d = Data(2018)
+    d = Data(year)
 
     a = d.load_dataset()
     print(a.shape)
@@ -35,8 +35,8 @@ def get_dataset(model_block):
         kanapki.append(
             Kanapka(
                 model_block=model_block,
-                features=x[:, :, 0:],
-                label=np.nanmean(y[:, :, 0]),
+                features=model_block.get_input(x),
+                label=model_block.get_output(y),
             ))
 
     return Dataset(model_block=model_block,
@@ -95,7 +95,9 @@ class Dataset:
 
 
 if __name__ == "__main__":
-    model_block = ModelConv2d  # FIXME: ModelConv2d
+    # model_block = ModelConv2d  # FIXME: ModelConv2d
+    model_block = ModelTree
+
     dataset = get_dataset(model_block)
     model = model_block(dataset=dataset)
     model.train()

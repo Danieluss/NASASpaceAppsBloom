@@ -47,6 +47,14 @@ class ModelTree:
         return self.pst.predict(arr)
 
     @staticmethod
+    def get_input(x):
+        return x[:, :, 0:]
+
+    @staticmethod
+    def get_output(y):
+        return np.nanmean(y[:, :, 0])
+
+    @staticmethod
     def get(cls):
         return cls.features.flatten(), cls.label
 
