@@ -2,6 +2,7 @@ import numpy as np
 import xarray as xr
 import scipy.interpolate
 from tqdm import tqdm
+from data_provider import DataProvider
 
 
 class SF:
@@ -11,12 +12,14 @@ class SF:
 
 
 class FeaturesExtractor:
-    def __init__(self, month, size_x=9, size_y=9, distance=40):
+    def __init__(self, year, month, size_x=9, size_y=9, distance=40, step=1):
+        DataProvider().fetch(year, month)
+        self.year = year
         self.month = month
         self.size_x = size_x
         self.size_y = size_y
         self.distance = distance
-        # self.features = [SF('a', 'chl_ocx'), SF('b', 'sst')]
+        self.step = step
         self.features = [
             SF("MO_CHL_chlor_a", "chlor_a"),
             SF("MO_FLH_nflh", "nflh"),
@@ -25,18 +28,20 @@ class FeaturesExtractor:
             SF("MO_PIC_pic", "pic"),
             SF("MO_POC_poc", "poc"),
         ]
+        self.dx = self.size_x*self.step
+        self.dy = self.size_y*self.step
 
         self.arrays = []
         for sf in self.features:
             self.arrays.append(self.get_array(sf))
         self.waters = self.get_array(SF("waters", "sst"))
-        print(self.waters[2].shape)
+        self.land_mask = np.isnan(self.waters[2])
 
     def get_array(self, feature):
         if feature.filename == "waters":
             f = "data/" + feature.filename + ".nc"
         else:
-            f = "data/" + feature.filename + str(self.month)  # + ".nc"
+            f = "data/" + feature.filename + str(self.year) + str(self.month)  # + ".nc"
         d = xr.open_dataset(f)
         return (
             np.array(d["lat"]),
@@ -68,17 +73,27 @@ class FeaturesExtractor:
         res = []
         for i in range(len(self.features)):
             res.append(self.get_feature_mod(i, x, y))
+        res.append(self.get_land(x, y))
         res = np.array(res)
         res = np.moveaxis(res, 0, -1)
         return res
 
     def get_feature_mod(self, i, x, y):
-        x_s = x - self.size_x // 2
-        y_s = y - self.size_y // 2
-        res = self.arrays[i][2][x_s:x_s + self.size_x:1, y_s:y_s +
-                                self.size_y:1]
-        if np.count_nonzero(np.isnan(res) == False) > self.size_x:
+        x_range = slice(x,x+self.dx,1)
+        y_range = slice(y,y+self.dy,1)
+        res = self.arrays[i][2][x_range, y_range]
+        land = self.land_mask[x_range, y_range]
+        if np.count_nonzero(np.isnan(res) == False) > self.dx:
             res = self.interpolate(res)
+        res[land] = np.nan
+        return res
+
+    def get_land(self, x, y):
+        x_range = slice(x,x+self.dx,1)
+        y_range = slice(y,y+self.dy,1)
+        land = self.land_mask[x_range, y_range]
+        res = np.zeros_like(land)
+        res[land] = 1
         return res
 
     def interpolate(self, arr):
@@ -96,38 +111,42 @@ class FeaturesExtractor:
     def get_waters(self):
         return self.waters[2]
 
-    def get_dataset(self, n=1000, threshold=0.8):
-        n = n // 2
-        val = np.argwhere(self.arrays[0][2] > threshold)
-        res = []
+    def add_to_res(self, val, res, n):
         for i in tqdm(range(n)):
             r = np.random.randint(0, len(val))
             v = val[r]
             res.append(self.get_grid_mod(v[0], v[1]))
 
-        val = np.argwhere(self.arrays[0][2] <= threshold)
-        for i in tqdm(range(n)):
-            r = np.random.randint(0, len(val))
-            v = val[r]
-            res.append(self.get_grid_mod(v[0], v[1]))
-        return res
+    def get_dataset(self, n=1000, threshold=0.8):
+        n = n // 2
+        res = []
+        val = np.argwhere(self.arrays[0][2][:-self.dx,:-self.dy] > threshold)
+        self.add_to_res(val, res, n)
+        val = np.argwhere(self.arrays[0][2][:-self.dx,:-self.dy] <= threshold)
+        self.add_to_res(val, res, n)
+        return np.array(res)
 
 
 if __name__ == "__main__":
-    f = FeaturesExtractor(20187, 9, 9)
+    f = FeaturesExtractor(2018, 7, 9, 9)
     a = f.get_grid(lat=0.0, lon=0.0)[:, :, 0]
     # a = a/np.max(a[np.isnan(a) == False])
 
     a[a < 0.7] = np.nan
 
-    c = f.get_dataset(10)
-    print(c.shape)
+    c = f.get_dataset(2)
+    # print(c.shape)
 
-    # b = f.get_waters()
+    b = f.get_waters()
 
     import matplotlib.pyplot as plt
 
     # # print(np.count_nonzero(a > 0.7)/a.size)
     # # ax[1].imshow(f.interpolate(a))
-    plt.imshow(c[0, :, :, 0])
+    
+    # plt.imshow(b[::10,::10])
+    n = c.shape[-1]
+    fig, ax = plt.subplots(1, n)
+    for i in range(n):
+        ax[i].imshow(c[0,:,:,i])
     plt.show()
