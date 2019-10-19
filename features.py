@@ -19,7 +19,7 @@ class FeaturesExtractor():
             self.arrays.append(self.get_array(sf))
 
     def get_array(self, feature):
-        f = feature.filename + str(self.month) + ".nc"
+        f = 'data/' + feature.filename + str(self.month) + ".nc"
         d = xr.open_dataset(f)
         return (np.array(d['lat']), np.array(d['lon']), np.array(d[feature.key]))
 
@@ -32,12 +32,14 @@ class FeaturesExtractor():
         return res
         
     def get_feature(self, i, lat, lon):
+        lat*=-1
         x = int((lat+90.0)*self.arrays[i][0].size/180.0)
         y = int((lon+180.0)*self.arrays[i][1].size/360.0)
         x_s = x-self.size_x//2
         y_s = y-self.size_y//2
         res = self.arrays[i][2][x_s:x_s+self.size_x:1, y_s:y_s+self.size_y:1]
-        res = self.interpolate(res)
+        if np.count_nonzero(np.isnan(res)==False) > 5:
+            res = self.interpolate(res)
         return res
     
     def interpolate(self, arr):
@@ -51,9 +53,9 @@ class FeaturesExtractor():
         return scipy.interpolate.griddata((x1, y1), arr.ravel(), (xx, yy), method='cubic')
 
 if __name__ == "__main__":
-    f = FeaturesExtractor(200910, 100, 100)
-    a = f.get_grid(lat=50.0, lon=-20.0)[:,:,0].reshape(100, 100)
-    a = a/np.max(a[np.isnan(a) == False])
+    f = FeaturesExtractor(20099, 100, 100)
+    a = f.get_grid(lat=50.0, lon=40.0)[:,:,0].reshape(100, 100)
+    # a = a/np.max(a[np.isnan(a) == False])
 
     import matplotlib.pyplot as plt
     plt.imshow(a)
