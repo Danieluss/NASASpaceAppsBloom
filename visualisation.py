@@ -14,7 +14,7 @@ class Visalisation:
         self.month = month
         self.path = "data/" + str(year) + str(month) + "v.pickle"
 
-    def prepare_dataset(self):
+    def prepare_dataset(self, precision=10.0):
         dx, dy = 9, 9
         a = FeaturesExtractor(self.year, self.month)
         if self.month == 12:
@@ -25,9 +25,9 @@ class Visalisation:
             month = self.month + 1
         b = FeaturesExtractor(year, month)
         self.res = []
-        for i in tqdm(range(0, a.map_shape[0], dx)):
+        for i in tqdm(range(0, a.map_shape[0], precision*dx)):
             res2 = []
-            for j in range(0, a.map_shape[1], dy):
+            for j in range(0, a.map_shape[1], precision*dy):
                 inp, out, land = self.get_input_and_real_output(
                     a, b, i, j, dx, dy)
                 res2.append([inp, out, land])
@@ -83,19 +83,32 @@ class Visalisation:
 
         real = np.array(real)
         predicted = np.array(predicted)
+        self.save_png("real", real)
+        self.save_png("pred", predicted[:,:,0])
         # print(np.unique(real), np.unique(predicted))
-        _, ax = plt.subplots(2, 1)
-        # ax[0].hist(real)
-        # ax[1].hist(predicted)
-        ax[0].imshow(real)
-        print(predicted.shape)
-        ax[1].imshow(predicted[:,:,0])
-        plt.show()
+        # _, ax = plt.subplots(2, 1)
+        # # ax[0].hist(real)
+        # # ax[1].hist(predicted)
+        # ax[0].imshow(real)
+        # ax[1].imshow(predicted[:,:,0])
+        # plt.show()
+        
+    def save_png(self, name, a):
+        arr = np.zeros((a.shape[0], a.shape[1], 3), dtype=np.uint8)
+        arr[np.isnan(a)] = [127, 127, 127]
+        arr[a == 1] = [51, 204, 51]
+        arr[a == 0] = [0, 153, 255]
+        from PIL import Image
+        img = Image.fromarray(arr)
+        img.save("sim/" + name + str(self.year)+str(self.month) + ".png")
+
 
 
 if __name__ == "__main__":
+    # v = Visalisation(2017, 1)
+    # for month in range(1, 13):
     v = Visalisation(2019, 6)
-    # v.prepare_dataset()
+    # v.prepare_dataset(3)
     v.load_dataset()
     t = ModelConv2d()
     t.load()
