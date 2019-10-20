@@ -4,6 +4,7 @@ from features import FeaturesExtractor
 import pickle
 from tqdm import tqdm
 from model.tree import ModelTree
+from model.conv2d import ModelConv2d
 from pprint import pprint
 
 
@@ -24,9 +25,9 @@ class Visalisation:
             month = self.month + 1
         b = FeaturesExtractor(year, month)
         self.res = []
-        for i in tqdm(range(0, a.map_shape[0], 10 * dx)):
+        for i in tqdm(range(0, a.map_shape[0], dx)):
             res2 = []
-            for j in range(0, a.map_shape[1], 10 * dy):
+            for j in range(0, a.map_shape[1], dy):
                 inp, out, land = self.get_input_and_real_output(
                     a, b, i, j, dx, dy)
                 res2.append([inp, out, land])
@@ -60,12 +61,12 @@ class Visalisation:
                     features=type(model).get_input(col[0]),
                 ).get()[0] for col in row
             ]
-            print(np.array(inp).shape)
+            # print(np.array(inp).shape)
             # [pprint(np.array(x)) for x in inp]
             # exit(0)
-            predicted2 = model.predict(inp)
-            ids = np.isnan(predicted2) == False
-            predicted2[ids] = predicted2[ids] <= 0.5
+            predicted2 = model.predict(np.array(inp))
+            # ids = np.isnan(predicted2) == False
+            predicted2[:,0] = predicted2[:,0] > predicted2[:,1]
             j = 0
             for col in row:
                 r = col[1]
@@ -87,15 +88,16 @@ class Visalisation:
         # ax[0].hist(real)
         # ax[1].hist(predicted)
         ax[0].imshow(real)
-        ax[1].imshow(predicted)
+        print(predicted.shape)
+        ax[1].imshow(predicted[:,:,0])
         plt.show()
 
 
 if __name__ == "__main__":
-    v = Visalisation(2018, 3)
-    v.prepare_dataset()
+    v = Visalisation(2019, 6)
+    # v.prepare_dataset()
     v.load_dataset()
-    t = ModelTree()
+    t = ModelConv2d()
     t.load()
     v.visualise(t)
     # a = FeaturesExtractor(2018, 1)
