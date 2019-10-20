@@ -5,7 +5,7 @@ from model.resnet9 import ResNet9
 
 class ModelConv2d:
     SHAPE = (9, 9, 7)
-    MODEL_PATH = "covn2dkeras.txt"
+    MODEL_PATH = "conv2dkeras"
     BATCH_SIZE = 128
     EPOCHS = 100
 
@@ -34,6 +34,16 @@ class ModelConv2d:
 
     def predict(self, arr):
         return self.model.predict(arr)
+
+    def predict_01(self, arr):
+        pred_01 = []
+        pred = self.model.predict(arr)
+        for x1, x2 in pred:
+            if x1 > x2:
+                pred_01.append(True)
+            else:
+                pred_01.append(False)
+        return pred_01
 
     @staticmethod
     def get_input(x):

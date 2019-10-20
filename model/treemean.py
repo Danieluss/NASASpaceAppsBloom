@@ -4,7 +4,7 @@ import lightgbm as lgb
 
 class ModelTreeMean:
     NUM_ROUNDS = 100 * 50000
-    MODEL_PATH = "treeboost.txt"
+    MODEL_PATH = "treemeanboost.txt"
     PARAMS = {
         "boosting_type": "gbdt",
         # "objective": "regression",
@@ -45,6 +45,16 @@ class ModelTreeMean:
 
     def predict(self, arr):
         return self.pst.predict(arr)
+
+    def predict_01(self, arr):
+        pred_01 = []
+        pred = self.pst.predict(arr)
+        for x in pred:
+            if x > 0.5:
+                pred_01.append(True)
+            else:
+                pred_01.append(False)
+        return pred_01
 
     @staticmethod
     def get_input(x):
