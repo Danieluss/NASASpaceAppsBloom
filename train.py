@@ -98,10 +98,11 @@ if __name__ == "__main__":
     # model_block = ModelConv2d  # FIXME: ModelConv2d
     model_block = ModelTree
 
-    dataset = get_dataset(model_block)
-    model = model_block(dataset=dataset)
-    model.train()
+    # dataset = get_dataset(model_block)
+    # model = model_block(dataset=dataset)
+    # model.train()
 
-    for i in range(100):
-        pred = model.predict([dataset.X[i]])
-        print(f"PRED {pred} | {dataset.y[i]}")
+    # for i in range(100):
+    #     pred = model.predict([dataset.X[i]])
+    #     print(f"PRED {pred} | {dataset.y[i]}")
+    

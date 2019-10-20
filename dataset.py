@@ -54,9 +54,12 @@ if __name__ == '__main__':
     # d.create_dataset(10)
     # d.save_dataset()
     c = d.load_dataset()
-    n = c.shape[-1]
-    import matplotlib.pyplot as plt
-    fig, ax = plt.subplots(1, n)
-    for i in range(n):
-        ax[i].imshow(c[600,0,:,:,i])
-    plt.show()
+    a = c[:,0,:,:,0]
+    a = np.nanmean(a, axis=(1, 2))
+    print(np.count_nonzero(a > 0.7)/a.size)
+    # n = c.shape[-1]
+    # import matplotlib.pyplot as plt
+    # fig, ax = plt.subplots(1, n)
+    # for i in range(n):
+    #     ax[i].imshow(c[600,0,:,:,i])
+    # plt.show()

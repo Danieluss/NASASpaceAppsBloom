@@ -25,9 +25,10 @@ class ModelTree:
     }
 
     def __init__(self, dataset=None):
-        X_train, X_test, y_train, y_test = dataset.train_and_test()
-        self.lgb_train = lgb.Dataset(X_train, y_train)
-        self.lgb_test = lgb.Dataset(X_test, y_test)
+        if dataset is not None:
+            X_train, X_test, y_train, y_test = dataset.train_and_test()
+            self.lgb_train = lgb.Dataset(X_train, y_train)
+            self.lgb_test = lgb.Dataset(X_test, y_test)
 
     def train(self):
         gbm = lgb.train(
