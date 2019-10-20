@@ -35,6 +35,7 @@ class FeaturesExtractor:
             self.arrays.append(self.get_array(sf))
         self.waters = self.get_array(SF("waters", "sst"))
         self.land_mask = np.isnan(self.waters[2])
+        self.map_shape = self.arrays[0][2].shape
 
     def get_array(self, feature):
         if feature.filename == "waters":
