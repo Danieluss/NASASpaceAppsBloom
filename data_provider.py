@@ -5,8 +5,7 @@ import urllib.request
 from calendar import monthrange
 import xarray as xr
 from ecmwfapi.api import ECMWFDataServer
-
-# import cfgrib
+import cfgrib
 
 ecmwf = ECMWFDataServer(url="https://api.ecmwf.int/v1", key="8e65cd061cb66a38a26c3e394d989444",
                         email="maciejanthonyczyzewski@gmail.com")
@@ -46,7 +45,7 @@ class GRIBResource:
         self.filename = filename
 
     def load(self):
-        # self.data = xr.open_dataset(self.filename, engine='cfgrib')
+        self.data = xr.open_dataset(self.filename, engine='cfgrib')
         return self
 
     def location(self):

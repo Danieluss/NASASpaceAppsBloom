@@ -27,8 +27,10 @@ class Data:
         dx = self.fe[0].dx
         dy = self.fe[0].dy
         val = np.argwhere(self.fe[0].arrays[0][2][:-dx,:-dy] > threshold)
+        print(val.size)
         self.add_to_res(val, res, n)
         val = np.argwhere(self.fe[0].arrays[0][2][:-dx,:-dy] <= threshold)
+        print(val.size)
         self.add_to_res(val, res, n)
         self.res = np.array(res)
 
@@ -49,12 +51,15 @@ class Data:
 
 if __name__ == '__main__':
     d = Data(2018)
-    d.create_dataset(1000)
-    d.save_dataset()
-    # c = d.load_dataset()
+    # d.create_dataset(10)
+    # d.save_dataset()
+    c = d.load_dataset()
+    a = c[:,0,:,:,0]
+    a = np.nanmean(a, axis=(1, 2))
+    print(np.count_nonzero(a > 0.7)/a.size)
     # n = c.shape[-1]
     # import matplotlib.pyplot as plt
     # fig, ax = plt.subplots(1, n)
     # for i in range(n):
-    #     ax[i].imshow(c[0,0,:,:,i])
+    #     ax[i].imshow(c[600,0,:,:,i])
     # plt.show()
