@@ -15,6 +15,11 @@ class Data:
             for fe in self.fe:
                 arr.append(fe.get_grid_mod(v[0], v[1]))
             for i in range(len(arr)-1):
+                a = arr[i+1][:,:,0]
+                if np.count_nonzero(np.isnan(a)) > a.size/2:
+                    # print("AAA")
+                    i-=1
+                    continue
                 res.append([arr[i], arr[i+1]])
 
 
@@ -51,15 +56,15 @@ class Data:
 
 if __name__ == '__main__':
     d = Data(2018)
-    # d.create_dataset(10)
+    # d.create_dataset(1000)
     # d.save_dataset()
     c = d.load_dataset()
     a = c[:,0,:,:,0]
-    a = np.nanmean(a, axis=(1, 2))
-    print(np.count_nonzero(a > 0.7)/a.size)
-    # n = c.shape[-1]
-    # import matplotlib.pyplot as plt
-    # fig, ax = plt.subplots(1, n)
-    # for i in range(n):
-    #     ax[i].imshow(c[600,0,:,:,i])
-    # plt.show()
+    # a = np.nanmean(a, axis=(1, 2))
+    # print(np.count_nonzero(a > 0.7)/a.size)
+    n = c.shape[-1]
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(1, n)
+    for i in range(n):
+        ax[i].imshow(c[900,0,:,:,i])
+    plt.show()
