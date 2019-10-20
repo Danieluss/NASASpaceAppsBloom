@@ -21,4 +21,4 @@ if __name__ == "__main__":
         b = get_name(i, 'real')
         concatenate_photos(a, b, 'con'+str(i))
 
-#convert -delay 20 -loop 0 con*.png res.gif
+#convert -delay 100 -loop 0 con*.png res.gif

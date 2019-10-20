@@ -53,7 +53,9 @@ class Visalisation:
 
         real = []
         predicted = []
+        current_month = []
         for row in tqdm(self.res):
+            current_month2 = []
             real2 = []
             inp = [
                 Kanapka(
@@ -74,24 +76,34 @@ class Visalisation:
                     r = np.nan
                 else:
                     r = np.nanmean(r) > threshold
+                s = col[0][:,:,0]
+                if np.count_nonzero(np.isnan(s)) == s.size:
+                    s = np.nan
+                else:
+                    s = np.nanmean(s) > threshold
                 if col[2]:
-                    predicted2[j], r = np.nan, np.nan
+                    predicted2[j], r, s = np.nan, np.nan, np.nan
+                current_month2.append(s)
                 real2.append(r)
                 j += 1
+            current_month.append(current_month2)
             real.append(real2)
             predicted.append(predicted2)
 
+
         real = np.array(real)
         predicted = np.array(predicted)
-        self.save_png("real", real)
-        self.save_png("pred", predicted[:,:,0])
+        current = np.array(current_month)
+        # self.save_png("real", real)
+        # self.save_png("pred", predicted[:,:,0])
         # print(np.unique(real), np.unique(predicted))
-        # _, ax = plt.subplots(2, 1)
+        _, ax = plt.subplots(3, 1)
         # # ax[0].hist(real)
         # # ax[1].hist(predicted)
-        # ax[0].imshow(real)
-        # ax[1].imshow(predicted[:,:,0])
-        # plt.show()
+        ax[0].imshow(real)
+        ax[1].imshow(predicted[:,:,0])
+        ax[2].imshow(current)
+        plt.show()
         
     def save_png(self, name, a):
         arr = np.zeros((a.shape[0], a.shape[1], 3), dtype=np.uint8)
@@ -107,8 +119,8 @@ class Visalisation:
 if __name__ == "__main__":
     # v = Visalisation(2017, 1)
     # for month in range(1, 13):
-    v = Visalisation(2019, 6)
-    # v.prepare_dataset(3)
+    v = Visalisation(2019, 5)
+    # v.prepare_dataset(1)
     v.load_dataset()
     t = ModelConv2d()
     t.load()
