@@ -103,6 +103,7 @@ class Visalisation:
         ax[0].imshow(real)
         ax[1].imshow(predicted[:,:,0])
         ax[2].imshow(current)
+        print(self.compute_loss(real, predicted[:,:,0]))
         plt.show()
         
     def save_png(self, name, a):
@@ -114,6 +115,9 @@ class Visalisation:
         img = Image.fromarray(arr)
         img.save("sim/" + name + str(self.year)+str(self.month) + ".png")
 
+    def compute_loss(self, a, b):
+        ids = ((np.isnan(a) == False) & (np.isnan(b) == False))
+        return np.count_nonzero(a[ids] == b[ids])/ids.size
 
 
 if __name__ == "__main__":
