@@ -58,7 +58,9 @@ class DataProvider:
         self.base = 'https://oceandata.sci.gsfc.nasa.gov/cgi/getfile/A{}{}{}{}.L3m_{}_9km.nc'
         self.nasa_datasets = ['MO_CHL_chlor_a', 'MO_FLH_nflh', 'MO_FLH_ipar', 'MO_NSST_sst', 'MO_PIC_pic', 'MO_POC_poc']
         self.ecmwf_datasets = ['SALT', 'CO', 'SO2']
+        self.ecmwf_datasets = []
         self.ecmwf_params = ['2.210/3.210', '123.210', '122.210']
+        self.ecmwf_params = []
 
     def fetch(self, year, month):
         if isinstance(year, list):
