@@ -27,8 +27,33 @@ class ModelTreeMean:
     def __init__(self, dataset=None):
         if dataset is not None:
             X_train, X_test, y_train, y_test = dataset.train_and_test()
-            self.lgb_train = lgb.Dataset(X_train, y_train)
-            self.lgb_test = lgb.Dataset(X_test, y_test)
+            print(f"---------------> \033[92m {X_train.shape}\033[m")
+            self.lgb_train = lgb.Dataset(
+                X_train,
+                y_train,
+                feature_name=[
+                    "chlor_a",
+                    "nflh",
+                    "ipar",
+                    "sst",
+                    "pic",
+                    "poc",
+                    "land",
+                ],
+            )
+            self.lgb_test = lgb.Dataset(
+                X_test,
+                y_test,
+                feature_name=[
+                    "chlor_a",
+                    "nflh",
+                    "ipar",
+                    "sst",
+                    "pic",
+                    "poc",
+                    "land",
+                ],
+            )
 
     def train(self):
         gbm = lgb.train(
@@ -58,8 +83,8 @@ class ModelTreeMean:
         return pred_01
 
     @staticmethod
-    def get_input(x):
-        return np.mean(x[:, :, 0:], axis=(2))
+    def get_input(x):  # (0, 1) correct, (2) better
+        return np.mean(x[:, :, 0:], axis=(0, 1))
 
     @staticmethod
     def get_output(y):

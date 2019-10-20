@@ -2,8 +2,16 @@ import numpy as np
 import lightgbm as lgb
 
 
+def get_vec_name(name, size=9):
+    names = []
+    for i in range(size):
+        for j in range(size):
+            names.append(f"{name}_{i}_{j}")
+    return names
+
+
 class ModelTree:
-    NUM_ROUNDS = 100 * 50000
+    NUM_ROUNDS = 300
     MODEL_PATH = "treeboost.txt"
     PARAMS = {
         "boosting_type": "gbdt",
@@ -27,8 +35,22 @@ class ModelTree:
     def __init__(self, dataset=None):
         if dataset is not None:
             X_train, X_test, y_train, y_test = dataset.train_and_test()
-            self.lgb_train = lgb.Dataset(X_train, y_train)
-            self.lgb_test = lgb.Dataset(X_test, y_test)
+            self.lgb_train = lgb.Dataset(
+                X_train,
+                y_train,
+                feature_name=get_vec_name("chlor_a") + get_vec_name("nflh") +
+                get_vec_name("ipar") + get_vec_name("sst") +
+                get_vec_name("pic") + get_vec_name("poc") +
+                get_vec_name("land"),
+            )
+            self.lgb_test = lgb.Dataset(
+                X_test,
+                y_test,
+                feature_name=get_vec_name("chlor_a") + get_vec_name("nflh") +
+                get_vec_name("ipar") + get_vec_name("sst") +
+                get_vec_name("pic") + get_vec_name("poc") +
+                get_vec_name("land"),
+            )
 
     def train(self):
         gbm = lgb.train(
@@ -36,7 +58,7 @@ class ModelTree:
             self.lgb_train,
             num_boost_round=self.NUM_ROUNDS,
             valid_sets=self.lgb_test,
-            early_stopping_rounds=self.NUM_ROUNDS / 10000,
+            early_stopping_rounds=max(300, self.NUM_ROUNDS / 10000),
         )
         gbm.save_model(self.MODEL_PATH)
         self.load()

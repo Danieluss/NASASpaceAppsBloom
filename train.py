@@ -34,26 +34,27 @@ def get_dataset(model_block, year=2018):
 
     for x, y in a:
         x_map = model_block.get_input(x)
-        """
         kanapki.append(
             Kanapka(
                 model_block=model_block,
                 features=x_map,
                 label=model_block.get_output(y),
             ))
-        """
         # FIXME: add [[augment]]
-        for _ in range(4):
-            x_copy = x_map
-            x_map = np.swapaxes(x_map, 0, 1)
-            if np.array_equal(x_copy, x_map):
-                break
-            kanapki.append(
-                Kanapka(
-                    model_block=model_block,
-                    features=x_map,
-                    label=model_block.get_output(y),
-                ))
+        try:
+            for _ in range(4):
+                x_copy = x_map
+                x_map = np.swapaxes(x_map, 0, 1)
+                if np.array_equal(x_copy, x_map):
+                    break
+                kanapki.append(
+                    Kanapka(
+                        model_block=model_block,
+                        features=x_map,
+                        label=model_block.get_output(y),
+                    ))
+        except:
+            pass
 
     return Dataset(model_block=model_block,
                    kanapki=kanapki,
@@ -115,11 +116,26 @@ if __name__ == "__main__":
     # model_block = ModelConv2d
     model_block = ModelTree
 
-    # dataset = get_dataset(model_block)
-    # model = model_block(dataset=dataset)
+    dataset = get_dataset(model_block)
+    model = model_block(dataset=dataset)
+    model.train()
+    # model.load()
+
+    import lightgbm as lgb
+    import matplotlib.pyplot as plt
+
+    print("Feature importances:", list(model.pst.feature_importance()))
+
+    ax = lgb.plot_tree(model.pst)
+    plt.show()
+
+    ax = lgb.plot_importance(model.pst,
+                             importance_type="gain",
+                             max_num_features=30)
+    plt.show()
+
     # model.train()
 
-    # for i in range(100):
-    #     pred = model.predict([dataset.X[i]])
-    #     print(f"PRED {pred} | {dataset.y[i]}")
-    
+    for i in range(100):
+        pred = model.predict([dataset.X[i]])
+        print(f"PRED {pred} | {dataset.y[i]}")
