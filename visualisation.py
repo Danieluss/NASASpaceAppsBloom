@@ -115,15 +115,16 @@ class Visalisation:
         img = Image.fromarray(arr)
         img.save("sim/" + name + str(self.year) + str(self.month) + ".png")
 
-    def compute_loss(self, a, b):
-        ids = (np.isnan(a) == False) & (np.isnan(b) == False)
-        return np.count_nonzero(a[ids] == b[ids]) / ids.size
+    def compute_loss(self, a, b, tol=0.3):
+        ind = (np.isnan(a) == False) & (np.isnan(b) == False)
+        return np.count_nonzero(
+            np.abs(a[ind] - b[ind]) <= tol) / np.count_nonzero(ind)
 
 
 if __name__ == "__main__":
     # v = Visalisation(2017, 1)
     # for month in range(1, 13):
-    v = Visalisation(2018, 11)  # 12, 5
+    v = Visalisation(2019, 6)  # 12, 5
     # v.prepare_dataset(4)
     v.load_dataset()
     t = ModelTree()

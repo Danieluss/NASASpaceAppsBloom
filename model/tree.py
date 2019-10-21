@@ -11,24 +11,24 @@ def get_vec_name(name, size=9):
 
 
 class ModelTree:
-    NUM_ROUNDS = 200
+    NUM_ROUNDS = 5000
     MODEL_PATH = "treeboost.txt"
     PARAMS = {
         "boosting_type": "gbdt",
-        "objective": "regression",
+        "objective": "l1",
         # "metric": "l2",
         # "objective": "binary",
-        "metric": ["l2", "binary_logloss"],
+        "metric": ["l1", "rmse"],
         "is_unbalance": True,
-        "feature_fraction": 0.85,
+        "feature_fraction": 0.80,
         "learning_rate": 0.005,
         "verbose": -1,
-        "min_split_gain": 0.1,
-        "reg_alpha": 0.3,
-        "max_bin": 512,  # 512*10 FIXME/RESEARCH
+        "min_split_gain": 0.05,
+        "reg_alpha": 0.2,
+        "max_bin": 256,  # 512*10 FIXME/RESEARCH
         "num_leaves": 32,  # 32*10 FIXME/RESEARCH
-        "max_depth": 9,
-        "min_child_weight": 0.5,
+        "max_depth": 5,
+        "min_child_weight": 0.3,
         "is_training_metric": "True",
     }
 
@@ -54,6 +54,7 @@ class ModelTree:
         gbm = lgb.train(
             self.PARAMS,
             self.lgb_train,
+            init_model=self.MODEL_PATH,
             num_boost_round=self.NUM_ROUNDS,
             valid_sets=self.lgb_test,
             early_stopping_rounds=max(300, self.NUM_ROUNDS / 10000),
