@@ -29,7 +29,13 @@ class ModelTree:
         "num_leaves": 32,  # 32*10 FIXME/RESEARCH
         "max_depth": 5,
         "min_child_weight": 0.3,
-        "is_training_metric": "True",
+        # "metric_freq": 10,
+        "boost_from_average": True,
+        "reg_sqrt": True,
+        "zero_as_missing": True,  # FIXME:?
+        "tree_learner": "feature",
+        "num_threads": 4,
+        # "is_training_metric": "True",
     }
 
     def __init__(self, dataset=None):
