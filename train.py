@@ -118,8 +118,8 @@ if __name__ == "__main__":
 
     dataset = get_dataset(model_block)
     model = model_block(dataset=dataset)
-    model.train()
     # model.load()
+    model.train()
 
     import lightgbm as lgb
     import matplotlib.pyplot as plt

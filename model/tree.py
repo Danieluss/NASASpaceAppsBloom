@@ -11,14 +11,14 @@ def get_vec_name(name, size=9):
 
 
 class ModelTree:
-    NUM_ROUNDS = 300
+    NUM_ROUNDS = 200
     MODEL_PATH = "treeboost.txt"
     PARAMS = {
         "boosting_type": "gbdt",
-        # "objective": "regression",
+        "objective": "regression",
         # "metric": "l2",
-        "objective": "binary",
-        "metric": ["binary_error", "binary_logloss"],
+        # "objective": "binary",
+        "metric": ["l2", "binary_logloss"],
         "is_unbalance": True,
         "feature_fraction": 0.85,
         "learning_rate": 0.005,
@@ -38,18 +38,16 @@ class ModelTree:
             self.lgb_train = lgb.Dataset(
                 X_train,
                 y_train,
-                feature_name=get_vec_name("chlor_a") + get_vec_name("nflh") +
-                get_vec_name("ipar") + get_vec_name("sst") +
-                get_vec_name("pic") + get_vec_name("poc") +
-                get_vec_name("land"),
+                feature_name=get_vec_name("nflh") + get_vec_name("ipar") +
+                get_vec_name("sst") + get_vec_name("pic") +
+                get_vec_name("poc") + get_vec_name("land"),
             )
             self.lgb_test = lgb.Dataset(
                 X_test,
                 y_test,
-                feature_name=get_vec_name("chlor_a") + get_vec_name("nflh") +
-                get_vec_name("ipar") + get_vec_name("sst") +
-                get_vec_name("pic") + get_vec_name("poc") +
-                get_vec_name("land"),
+                feature_name=get_vec_name("nflh") + get_vec_name("ipar") +
+                get_vec_name("sst") + get_vec_name("pic") +
+                get_vec_name("poc") + get_vec_name("land"),
             )
 
     def train(self):
@@ -70,18 +68,18 @@ class ModelTree:
         return self.pst.predict(arr)
 
     def predict_01(self, arr):
-        pred_01 = []
-        pred = self.pst.predict(arr)
-        for x in pred:
-            if x > 0.5:
-                pred_01.append(True)
-            else:
-                pred_01.append(False)
-        return pred_01
+        # pred_01 = []
+        return self.pst.predict(arr)
+        # for x in pred:
+        #    if x > 0.5:
+        #        pred_01.append(False)
+        #    else:
+        #        pred_01.append(True)
+        # return pred_01
 
     @staticmethod
     def get_input(x):
-        return x[:, :, 0:]
+        return x[:, :, 1:]
 
     @staticmethod
     def get_output(y):
@@ -96,4 +94,4 @@ class ModelTree:
         cls.X = np.array(cls.X)
         cls.y = np.array(cls.y)
         # binaryzujemy wynik
-        cls.y = np.where(cls.y > cls.threshold, 0, 1)
+        # cls.y = np.where(cls.y > cls.threshold, 0, 1)
