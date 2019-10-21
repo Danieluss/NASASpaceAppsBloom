@@ -32,7 +32,7 @@ def get_dataset(model_block, year=2018):
     a = d.load_dataset()
     print(a.shape)
 
-    for x, y in a:
+    for x, y in tqdm(a):
         x_map = model_block.get_input(x)
         kanapki.append(
             Kanapka(
@@ -41,7 +41,7 @@ def get_dataset(model_block, year=2018):
                 label=model_block.get_output(y),
             ))
         # FIXME: add [[augment]]
-        try:
+        """try:
             for _ in range(4):
                 x_copy = x_map
                 x_map = np.swapaxes(x_map, 0, 1)
@@ -54,7 +54,7 @@ def get_dataset(model_block, year=2018):
                         label=model_block.get_output(y),
                     ))
         except:
-            pass
+            pass"""
 
     return Dataset(model_block=model_block,
                    kanapki=kanapki,
@@ -119,8 +119,9 @@ if __name__ == "__main__":
     dataset = get_dataset(model_block)
     model = model_block(dataset=dataset)
     # model.load()
-    model.train()
-
+    for i in tqdm(range(1000)):
+        model.train()
+    """
     import lightgbm as lgb
     import matplotlib.pyplot as plt
 
@@ -133,6 +134,7 @@ if __name__ == "__main__":
                              importance_type="gain",
                              max_num_features=30)
     plt.show()
+    """
 
     # model.train()
 

@@ -49,7 +49,7 @@ class Data:
         with open(filename, "rb") as f:
             self.res = pickle.load(f)
         return self.res  # (number_of_examples, 2, x, y, number_of_features)
-    
+
     def update_dataset(self, d):
         self.res = np.concatenate((self.res, d.res))
 
@@ -59,16 +59,17 @@ class Data:
 
 if __name__ == "__main__":
     d = Data(2018)
-    d.load_dataset()
-    # d.create_dataset(1000)
+    # d.load_dataset()
+    d.create_dataset(8000)
     # d.save_dataset()
     print(d.get_dataset().shape)
-    e = Data(2018)
-    e.create_dataset(10)
+    e = Data(2017)
+    e.create_dataset(8000)
     print(e.get_dataset().shape)
     d.update_dataset(e)
     print(d.get_dataset().shape)
-    
+    d.save_dataset()
+    """
     c = d.load_dataset()
     a = c[:, 0, :, :, 0]
     # a = np.nanmean(a, axis=(1, 2))
@@ -80,3 +81,4 @@ if __name__ == "__main__":
     for i in range(n):
         ax[i].imshow(c[900, 0, :, :, i])
     plt.show()
+    """

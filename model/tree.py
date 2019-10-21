@@ -10,8 +10,11 @@ def get_vec_name(name, size=9):
     return names
 
 
+COMP_BLOCK = 1000
+
+
 class ModelTree:
-    NUM_ROUNDS = 5000
+    NUM_ROUNDS = 2 * COMP_BLOCK  # FIXME
     MODEL_PATH = "treeboost.txt"
     PARAMS = {
         "boosting_type": "gbdt",
@@ -35,6 +38,7 @@ class ModelTree:
         "zero_as_missing": True,  # FIXME:?
         "tree_learner": "feature",
         "num_threads": 4,
+        "snapshot_freq": COMP_BLOCK,
         # "is_training_metric": "True",
     }
 
