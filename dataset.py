@@ -7,6 +7,8 @@ import pickle
 class Data:
     def __init__(self, year, size_x=9, size_y=9):
         self.year = year
+        self.size_x = size_x
+        self.size_y = size_y
 
     def add_to_res(self, val, res, n):
         for i in tqdm(range(n)):
@@ -18,8 +20,6 @@ class Data:
             for i in range(len(arr) - 1):
                 a = arr[i + 1][:, :, 0]
                 if np.count_nonzero(np.isnan(a)) > a.size / 2:
-                    # print("AAA")
-                    i -= 1
                     continue
                 res.append([arr[i], arr[i + 1]])
 
@@ -49,6 +49,9 @@ class Data:
         with open(filename, "rb") as f:
             self.res = pickle.load(f)
         return self.res  # (number_of_examples, 2, x, y, number_of_features)
+    
+    def update_dataset(self, d):
+        self.res = np.concatenate((self.res, d.res))
 
     def get_dataset(self):
         return self.res
@@ -56,9 +59,16 @@ class Data:
 
 if __name__ == "__main__":
     d = Data(2018)
-    d.create_dataset(1000)
-    d.save_dataset()
-    """
+    d.load_dataset()
+    # d.create_dataset(1000)
+    # d.save_dataset()
+    print(d.get_dataset().shape)
+    e = Data(2018)
+    e.create_dataset(10)
+    print(e.get_dataset().shape)
+    d.update_dataset(e)
+    print(d.get_dataset().shape)
+    
     c = d.load_dataset()
     a = c[:, 0, :, :, 0]
     # a = np.nanmean(a, axis=(1, 2))
@@ -69,4 +79,4 @@ if __name__ == "__main__":
     fig, ax = plt.subplots(1, n)
     for i in range(n):
         ax[i].imshow(c[900, 0, :, :, i])
-    plt.show()"""
+    plt.show()
