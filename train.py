@@ -90,6 +90,7 @@ class Dataset:
         if kanapki is None:
             self.fake()  # FIXME: lista kanapek
         else:
+            self.size = len(kanapki)
             for a in kanapki:
                 f, l = a.get()
                 self.X.append(f)
@@ -119,8 +120,17 @@ if __name__ == "__main__":
     dataset = get_dataset(model_block)
     model = model_block(dataset=dataset)
     # model.load()
-    for i in tqdm(range(1000)):
-        model.train()
+    size = dataset.size
+    mini_epochs = 100
+    global_epochs = 10
+    # FIXME: find HARD BATCH
+    for j in range(global_epochs):
+        for i in tqdm(range(mini_epochs)):
+            try:
+                step = int(size / mini_epochs)
+                model.train(i * step, (i + 1) * step)
+            except:
+                pass
     """
     import lightgbm as lgb
     import matplotlib.pyplot as plt
@@ -137,7 +147,7 @@ if __name__ == "__main__":
     """
 
     # model.train()
-
+    model.load()
     for i in range(100):
         pred = model.predict([dataset.X[i]])
         print(f"PRED {pred} | {dataset.y[i]}")

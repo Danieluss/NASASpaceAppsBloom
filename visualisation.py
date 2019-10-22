@@ -124,7 +124,7 @@ class Visalisation:
 if __name__ == "__main__":
     # v = Visalisation(2017, 1)
     # for month in range(1, 13):
-    v = Visalisation(2019, 6)  # 12, 5
+    v = Visalisation(2019, 1)  # 12, 5
     # v.prepare_dataset(4)
     v.load_dataset()
     t = ModelTree()
