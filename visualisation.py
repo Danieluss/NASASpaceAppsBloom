@@ -79,8 +79,8 @@ class Visalisation:
                 s = col[0][:, :, 0]
                 if np.count_nonzero(np.isnan(s)) == s.size:
                     s = np.nan
-                # else:
-                #    s = np.nanmean(s) > threshold
+                else:
+                    s = np.nanmean(s)
                 if col[2]:
                     predicted2[j], r, s = np.nan, np.nan, np.nan
                 current_month2.append(s)
@@ -96,13 +96,16 @@ class Visalisation:
         # self.save_png("real", real)
         # self.save_png("pred", predicted[:,:,0])
         # print(np.unique(real), np.unique(predicted))
-        _, ax = plt.subplots(2, 1)
+        _, ax = plt.subplots(3, 1)
         # # ax[0].hist(real)
         # # ax[1].hist(predicted)
         ax[0].imshow(real, vmin=0, vmax=1)
+        print(predicted[:, :])
         ax[1].imshow(predicted[:, :], vmin=0, vmax=1)
-        # ax[2].imshow(current)  # FIXME
-        print(self.compute_loss(real, predicted[:, :]))
+        ax[2].imshow(current, vmin=0, vmax=1)  # FIXME
+        print("BASELINE", self.compute_loss(real, current))
+        print(">>      ", self.compute_loss(real, predicted[:, :]))
+        print("CC      ", self.compute_loss(current, predicted))
         plt.show()
 
     def save_png(self, name, a):
@@ -124,8 +127,8 @@ class Visalisation:
 if __name__ == "__main__":
     # v = Visalisation(2017, 1)
     # for month in range(1, 13):
-    v = Visalisation(2019, 1)  # 12, 5
-    # v.prepare_dataset(4)
+    v = Visalisation(2019, 6)  # 12, 5
+    # v.prepare_dataset(3)
     v.load_dataset()
     t = ModelTree()
     t.load()

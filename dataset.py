@@ -5,10 +5,8 @@ import pickle
 
 
 class Data:
-    def __init__(self, year, size_x=9, size_y=9):
+    def __init__(self, year):
         self.year = year
-        self.size_x = size_x
-        self.size_y = size_y
 
     def add_to_res(self, val, res, n):
         for i in tqdm(range(n)):
@@ -60,11 +58,11 @@ class Data:
 if __name__ == "__main__":
     d = Data(2018)
     # d.load_dataset()
-    d.create_dataset(8000)
+    d.create_dataset(1000)
     # d.save_dataset()
     print(d.get_dataset().shape)
     e = Data(2017)
-    e.create_dataset(8000)
+    e.create_dataset(1000)
     print(e.get_dataset().shape)
     d.update_dataset(e)
     print(d.get_dataset().shape)

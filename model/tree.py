@@ -10,40 +10,18 @@ def get_vec_name(name, size=9):
     return names
 
 
-COMP_BLOCK = 2500
-
-PARAMS_OLD = {
-    "boosting_type": "gbdt",
-    "objective": "l1",
-    "metric": ["l1", "rmse"],
-    "is_unbalance": True,
-    "feature_fraction": 0.80,
-    "learning_rate": 0.2,
-    "verbose": -1,
-    "min_split_gain": 0.05,
-    "reg_alpha": 0.2,
-    "max_bin": 256,
-    "num_leaves": 32,
-    "max_depth": 5,
-    "min_child_weight": 0.3,
-    "boost_from_average": True,
-    "reg_sqrt": True,
-    "zero_as_missing": True,
-    "tree_learner": "feature",
-    "num_threads": 4,
-    "snapshot_freq": COMP_BLOCK,
-}
+COMP_BLOCK = 1000
 
 
 class ModelTree:
     NUM_ROUNDS = 2 * COMP_BLOCK  # FIXME
     MODEL_PATH = "treeboost.txt"
     PARAMS = {
-        "boosting_type": "gbdt",
+        "boosting_type": "dart",
         "objective": "l1",
         # "metric": "l2",
         # "objective": "binary",
-        "metric": ["l1", "rmse"],
+        "metric": ["l1", "l2", "rmse"],
         "is_unbalance": True,
         "feature_fraction": 0.80,
         "learning_rate": 0.005,  # FIXME: 0.005 PERFECT
@@ -51,16 +29,28 @@ class ModelTree:
         "min_split_gain": 0.1,
         "reg_alpha": 0.2,
         "max_bin": 32,  # 512*10 FIXME/RESEARCH
-        "num_leaves": 32,  # 32*10 FIXME/RESEARCH
+        "num_leaves": 128,  # 32*10 FIXME/RESEARCH
         "max_depth": 5,
         "min_child_weight": 0.3,
         # "metric_freq": 10,
         "boost_from_average": True,
         "reg_sqrt": True,
         "zero_as_missing": True,  # FIXME:?
-        "tree_learner": "feature",
+        "tree_learner": "data",
         "num_threads": 4,
         "snapshot_freq": COMP_BLOCK,
+        # TEST
+        "num_leaves": 5,
+        "learning_rate": 0.05,
+        "n_estimators": 720,
+        "max_bin": 55,
+        "bagging_fraction": 0.8,
+        "bagging_freq": 5,
+        "feature_fraction": 0.2319,
+        "feature_fraction_seed": 9,
+        "bagging_seed": 9,
+        "min_data_in_leaf": 6,
+        "min_sum_hessian_in_leaf": 11
         # "is_training_metric": "True",
     }
 
@@ -74,25 +64,25 @@ class ModelTree:
         lgb_train = lgb.Dataset(
             self.X_train[start:end],
             self.y_train[start:end],
-            feature_name=get_vec_name("nflh") + get_vec_name("ipar") +
-            get_vec_name("sst") + get_vec_name("pic") + get_vec_name("poc") +
-            get_vec_name("land"),
+            # feature_name=get_vec_name("nflh") + get_vec_name("ipar") +
+            # get_vec_name("sst") + get_vec_name("pic") + get_vec_name("poc") +
+            # get_vec_name("land"),
             free_raw_data=False,
         )
         print("@test")
         lgb_test = lgb.Dataset(
-            self.X_test[start:end],
-            self.y_test[start:end],
-            feature_name=get_vec_name("nflh") + get_vec_name("ipar") +
-            get_vec_name("sst") + get_vec_name("pic") + get_vec_name("poc") +
-            get_vec_name("land"),
+            self.X_test,
+            self.y_test,
+            # feature_name=get_vec_name("nflh") + get_vec_name("ipar") +
+            # get_vec_name("sst") + get_vec_name("pic") + get_vec_name("poc") +
+            # get_vec_name("land"),
             free_raw_data=False,
         )
         print("@train")
         gbm = lgb.train(
             self.PARAMS,
             lgb_train,
-            # init_model=self.MODEL_PATH,
+            init_model=self.MODEL_PATH,
             num_boost_round=self.NUM_ROUNDS,
             valid_sets=lgb_test,
             early_stopping_rounds=max(300, self.NUM_ROUNDS / 10000),
@@ -119,11 +109,12 @@ class ModelTree:
 
     @staticmethod
     def get_input(x):
-        return x[:, :, 1:]
+        return x[:, :, 1:]  # ?
 
     @staticmethod
     def get_output(y):
-        return np.nanmean(y[:, :, 0])
+        w = np.random.uniform(0.9, 1.1)
+        return np.nanmean(y[:, :, 0]) * w
 
     @staticmethod
     def get(cls):
