@@ -18,7 +18,7 @@ $ python3 dataset.py
 $ python3 train.py
 ```
 
-## Results
+## View results
 
 ```
 $ python3 visualisation.py
