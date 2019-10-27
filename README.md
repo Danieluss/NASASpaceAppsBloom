@@ -1,6 +1,25 @@
-Training model:
+# 
+
+## Install
 
 ```bash
-$ pip3 install -r requirements.txt
-$ python3 model.py
+$ /bin/bash install.sh
+```
+
+## Fetch and preprocess dataset
+
+```bash
+$ python3 dataset.py
+```
+
+## Train model
+
+```
+$ python3 train.py
+```
+
+## Results
+
+```
+$ python3 visualisation.py
 ```
