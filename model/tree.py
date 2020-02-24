@@ -116,8 +116,7 @@ class ModelTree:
         w = np.random.uniform(0.9, 1.1)
         return np.nanmean(y[:, :, 0]) * w
 
-    @staticmethod
-    def get(cls):
+    def get(self, cls):
         return cls.features.flatten(), cls.label
 
     @staticmethod

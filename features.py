@@ -79,8 +79,8 @@ class FeaturesExtractor:
         return res
 
     def get_feature_mod(self, i, x, y):
-        x_range = slice(x,x+self.dx,1)
-        y_range = slice(y,y+self.dy,1)
+        x_range = slice(x,x+self.dx,self.step)
+        y_range = slice(y,y+self.dy,self.step)
         res = self.arrays[i][2][x_range, y_range]
         land = self.land_mask[x_range, y_range]
         if np.count_nonzero(np.isnan(res) == False) > self.dx:
@@ -89,8 +89,8 @@ class FeaturesExtractor:
         return res
 
     def get_land(self, x, y):
-        x_range = slice(x,x+self.dx,1)
-        y_range = slice(y,y+self.dy,1)
+        x_range = slice(x,x+self.dx,self.step)
+        y_range = slice(y,y+self.dy,self.step)
         land = self.land_mask[x_range, y_range]
         res = np.zeros_like(land)
         res[land] = 1

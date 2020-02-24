@@ -17,7 +17,7 @@ class Data:
                 arr.append(fe.get_grid_mod(v[0], v[1]))
             for i in range(len(arr) - 1):
                 a = arr[i + 1][:, :, 0]
-                if np.count_nonzero(np.isnan(a)) > a.size / 2:
+                if np.count_nonzero(np.isnan(a)) > a.size / 2 or np.isnan(arr[i+1][4,4,0]):
                     continue
                 res.append([arr[i], arr[i + 1]])
 
@@ -61,22 +61,25 @@ if __name__ == "__main__":
     d.create_dataset(1000)
     # d.save_dataset()
     print(d.get_dataset().shape)
-    e = Data(2017)
-    e.create_dataset(1000)
-    print(e.get_dataset().shape)
-    d.update_dataset(e)
+    # e = Data(2017)
+    # e.create_dataset(1000)
+    # print(e.get_dataset().shape)
+    # d.update_dataset(e)
     print(d.get_dataset().shape)
     d.save_dataset()
-    """
-    c = d.load_dataset()
-    a = c[:, 0, :, :, 0]
+    
+    # c = d.load_dataset()
+    # a = c[:, 0, :, :, 0]
     # a = np.nanmean(a, axis=(1, 2))
     # print(np.count_nonzero(a > 0.7)/a.size)
-    n = c.shape[-1]
-    import matplotlib.pyplot as plt
+    # n = c.shape[-1]
+    # import matplotlib.pyplot as plt
+    # plt.hist(a)
+    # plt.show()
 
-    fig, ax = plt.subplots(1, n)
-    for i in range(n):
-        ax[i].imshow(c[900, 0, :, :, i])
-    plt.show()
-    """
+    # fig, ax = plt.subplots(2, n)
+    # for i in range(n):
+    #     ax[0][i].imshow(c[200, 0, :, :, i])
+    #     ax[1][i].imshow(c[200, 1, :, :, i])
+    # plt.show()
+    

@@ -23,14 +23,20 @@ print("[MODEL]")
 THRESHOLD = 0.8  # FIXME: in future linear
 
 
-def get_dataset(model_block, year=2018):
+def get_dataset(model_block, model, year=2018):
     global THRESHOLD
 
     kanapki = []
     d = Data(year)
 
     a = d.load_dataset()
-    print(a.shape)
+    b = a[:,0]
+    model.mi=np.nanmean(b, axis=(0,1,2)).reshape(1,1,7)
+    model.sigma=np.nanstd(b, axis=(0,1,2)).reshape(1,1,7)
+    # print(b.shape, np.nanmean(a[:,1,:,:,0]))
+    # for x, y in a:
+    #     if np.nanmean(y[:,:,0]) > 0.8:
+    #         print(np.nanmean(x[:,:,0]), np.nanmean(y[:,:,0]))
 
     for x, y in tqdm(a):
         x_map = model_block.get_input(x)
@@ -58,7 +64,7 @@ def get_dataset(model_block, year=2018):
 
     return Dataset(model_block=model_block,
                    kanapki=kanapki,
-                   threshold=THRESHOLD)
+                   threshold=THRESHOLD, model=model)
 
 
 class Kanapka:
@@ -78,13 +84,16 @@ class Kanapka:
 
     def get(self):
         return self.model_block.get(self)
+    
+    def get(self, model):
+        return model.get(self)
 
 
 class Dataset:
     X = []
     y = []
 
-    def __init__(self, model_block=None, kanapki=None, threshold=None):
+    def __init__(self, model_block=None, kanapki=None, threshold=None, model=None):
         self.model_block = model_block
         self.threshold = threshold
         if kanapki is None:
@@ -92,7 +101,7 @@ class Dataset:
         else:
             self.size = len(kanapki)
             for a in kanapki:
-                f, l = a.get()
+                f, l = model.get(a)
                 self.X.append(f)
                 self.y.append(l)
         self.model_block.normalize(self)
@@ -114,23 +123,23 @@ class Dataset:
 
 if __name__ == "__main__":
     # model_block = ModelConv2d  # FIXME: ModelConv2d
-    # model_block = ModelConv2d
-    model_block = ModelTree
-
-    dataset = get_dataset(model_block)
-    model = model_block(dataset=dataset)
+    model_block = ModelConv2d
+    # model_block = ModelTree
+    model = model_block()
+    model.dataset = get_dataset(model_block, model)
+    print("stats: ", model.mi, model.sigma)
     # model.load()
-    size = dataset.size
-    mini_epochs = 100
-    global_epochs = 10
-    # FIXME: find HARD BATCH
-    for j in range(global_epochs):
-        for i in tqdm(range(mini_epochs)):
-            try:
-                step = int(size / mini_epochs)
-                model.train(i * step, (i + 1) * step)
-            except:
-                pass
+    # size = dataset.size
+    # mini_epochs = 100
+    # global_epochs = 10
+    # # FIXME: find HARD BATCH
+    # for j in range(global_epochs):
+    #     for i in tqdm(range(mini_epochs)):
+    #         try:
+    #             step = int(size / mini_epochs)
+    #             model.train(i * step, (i + 1) * step)
+    #         except:
+    #             pass
     """
     import lightgbm as lgb
     import matplotlib.pyplot as plt
@@ -146,8 +155,8 @@ if __name__ == "__main__":
     plt.show()
     """
 
-    # model.train()
-    model.load()
-    for i in range(100):
-        pred = model.predict([dataset.X[i]])
-        print(f"PRED {pred} | {dataset.y[i]}")
+    model.train()
+    # model.load()
+    # for i in range(100):
+    #     pred = model.predict([dataset.X[i]])
+    #     print(f"PRED {pred} | {dataset.y[i]}")

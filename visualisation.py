@@ -61,12 +61,12 @@ class Visalisation:
                 Kanapka(
                     model_block=type(model),
                     features=type(model).get_input(col[0]),
-                ).get()[0] for col in row
+                ).get(model)[0] for col in row
             ]
             # print(np.array(inp).shape)
             # [pprint(np.array(x)) for x in inp]
             # exit(0)
-            predicted2 = model.predict_01(np.array(inp))
+            predicted2 = model.predict(np.array(inp))[:,0]
             # ids = np.isnan(predicted2) == False
             # predicted2[:, 0] = predicted2[:, 0] > predicted2[:, 1]
             j = 0
@@ -91,8 +91,10 @@ class Visalisation:
             predicted.append(predicted2)
 
         real = np.array(real)
+        real = ModelConv2d.sigmoid(3*(real-threshold))
         predicted = np.array(predicted)
         current = np.array(current_month)
+        current = ModelConv2d.sigmoid(3*(current-threshold))
         # self.save_png("real", real)
         # self.save_png("pred", predicted[:,:,0])
         # print(np.unique(real), np.unique(predicted))
@@ -118,7 +120,7 @@ class Visalisation:
         img = Image.fromarray(arr)
         img.save("sim/" + name + str(self.year) + str(self.month) + ".png")
 
-    def compute_loss(self, a, b, tol=0.3):
+    def compute_loss(self, a, b, tol=0.1):
         ind = (np.isnan(a) == False) & (np.isnan(b) == False)
         return np.count_nonzero(
             np.abs(a[ind] - b[ind]) <= tol) / np.count_nonzero(ind)
@@ -127,10 +129,10 @@ class Visalisation:
 if __name__ == "__main__":
     # v = Visalisation(2017, 1)
     # for month in range(1, 13):
-    v = Visalisation(2019, 6)  # 12, 5
-    # v.prepare_dataset(3)
+    v = Visalisation(2019, 5)  # 12, 5
+    v.prepare_dataset(2)
     v.load_dataset()
-    t = ModelTree()
+    t = ModelConv2d()
     t.load()
     v.visualise(t)
     # a = FeaturesExtractor(2018, 1)

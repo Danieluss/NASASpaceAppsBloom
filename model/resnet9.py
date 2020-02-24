@@ -77,8 +77,8 @@ def ResNet9(x_size, y_size, features):
     model = Model(inputs=X_input, outputs=X, name="ResNet9")
 
     model.compile(
-        loss="binary_crossentropy",
-        optimizer=Adam(lr=0.001),
+        loss="categorical_crossentropy",
+        optimizer=Adam(lr=0.0001),
         metrics=["binary_accuracy"],
     )
     return model

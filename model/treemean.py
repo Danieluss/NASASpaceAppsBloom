@@ -90,8 +90,7 @@ class ModelTreeMean:
     def get_output(y):
         return np.nanmean(y[:, :, 0])
 
-    @staticmethod
-    def get(cls):
+    def get(self, cls):
         return cls.features.flatten(), cls.label
 
     @staticmethod
